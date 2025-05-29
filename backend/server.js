@@ -1,32 +1,36 @@
 const express = require('express');
-const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 
+// Criando o app Express
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors());
-app.use(bodyParser.json());
+// Middleware
+app.use(cors());  // Habilita CORS para permitir requisições de diferentes origens
+app.use(express.json());  // Permite a leitura de requisições com body JSON
 
-// APIs
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/chat', require('./routes/chat'));
+// Roteamento das APIs
+// Aqui estamos usando as rotas de auth e chat
+app.use('/api/auth', require('./routes/auth'));  // Roteador de autenticação (registro e login)
+app.use('/api/chat', require('./routes/chat'));  // Roteador de chat (envio e recuperação de mensagens)
 
-// Serve frontend static files
-const frontendPath = path.join(__dirname, '..', 'frontend');
-app.use(express.static(frontendPath));
+// Serve os arquivos estáticos do frontend
+const frontendPath = path.join(__dirname, '..', 'frontend');  // Caminho do diretório frontend
+app.use(express.static(path.join(__dirname, '..', 'frontend')));  // Serve o frontend como arquivos estáticos
 
-// Default route
-app.get('/', (req, res) => {
+// Rota padrão para enviar o arquivo index.html do frontend
+app.get('/', (_req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
-// Fallback for SPA frontend routing (optional)
-app.get('*', (req, res) => {
+// Fallback para SPA (Single Page Application)
+// Isso garante que qualquer rota não encontrada no backend vá para o frontend para lidar com as rotas de SPA
+app.get('*', (_req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
+// Inicia o servidor na porta definida
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Servidor rodando na porta ${PORT}`);
 });
